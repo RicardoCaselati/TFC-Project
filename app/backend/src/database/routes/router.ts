@@ -1,11 +1,8 @@
-// import * as express from 'express';
 import { Router } from 'express';
-import login from './login.router';
+import loginRouter from './login.router';
 
-const router = Router();
+const routes = Router();
 
-const routes = (): void => {
-  router.use('/login', login);
-};
+routes.use('/login', loginRouter);
 
 export default routes;
