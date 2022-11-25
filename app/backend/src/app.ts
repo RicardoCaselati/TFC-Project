@@ -1,5 +1,4 @@
 import * as express from 'express';
-// import login from './database/routes/login.router';
 import routes from './database/routes/router';
 
 class App {
