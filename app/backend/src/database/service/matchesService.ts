@@ -1,6 +1,7 @@
+// import { Request, Response } from 'express';
 import Matches from '../models/Matches';
 import Team from '../models/Teams';
-import IMatches from '../interfaces/matches/IMatches';
+import IMatches, { IRound } from '../interfaces/matches/IMatches';
 
 const matchesServiceGetAll = async (): Promise<{ matches: Matches[] }> => {
   const matches = await Matches.findAll({
@@ -60,9 +61,23 @@ const matchesServiceUpdateMatch = async (id: number) => {
   return response;
 };
 
+const matchesServiceUpdateScore = async (
+  id: number,
+  requestObject: IRound,
+) => {
+  const { homeTeamGoals, awayTeamGoals } = requestObject;
+  await Matches.update(
+    { homeTeamGoals, awayTeamGoals },
+    { where: { id } },
+  );
+  const response = { message: 'Updated' };
+  return response;
+};
+
 export {
   matchesServiceGetAll,
   matchesServiceGetProgress,
   matchesServiceInPutMatch,
   matchesServiceUpdateMatch,
+  matchesServiceUpdateScore,
 };

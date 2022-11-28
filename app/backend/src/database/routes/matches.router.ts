@@ -3,6 +3,7 @@ import {
   matchesControllerGetAll,
   matchesControllerInPutMatch,
   matchesControllerUpdateMatch,
+  matchesControllerUpdateScore,
 } from '../controller/matchesController';
 import {
   validateNewMatchBody,
@@ -22,5 +23,7 @@ router.post(
   matchesControllerInPutMatch,
 );
 router.patch('/:id/finish', matchesControllerUpdateMatch);
+
+router.patch('/:id', matchesControllerUpdateScore);
 
 export default router;

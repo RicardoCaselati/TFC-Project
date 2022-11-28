@@ -4,6 +4,7 @@ import {
   matchesServiceGetProgress,
   matchesServiceInPutMatch,
   matchesServiceUpdateMatch,
+  matchesServiceUpdateScore,
 } from '../service/matchesService';
 
 async function matchesControllerGetAll(req: Request, res: Response) {
@@ -33,8 +34,27 @@ async function matchesControllerUpdateMatch(req: Request, res: Response) {
   res.status(200).json({ message });
 }
 
+// async function matchesControllerUpdateScore(req: Request, res: Response) {
+//   const id = Number(req.params.id);
+//   const { homeTeamGoals, awayTeamGoals } = req.body;
+
+//   const { message } = await matchesServiceUpdateScore(id, homeTeamGoals, awayTeamGoals);
+//   if (!message) return res.status(400).json({ message: 'No teams patched' });
+//   res.status(200).json({ message });
+// }
+
+async function matchesControllerUpdateScore(req: Request, res: Response) {
+  const id = Number(req.params.id);
+  const requestObject = req.body;
+
+  const { message } = await matchesServiceUpdateScore(id, requestObject);
+  if (!message) return res.status(400).json({ message: 'No teams patched' });
+  res.status(200).json({ message });
+}
+
 export {
   matchesControllerGetAll,
   matchesControllerInPutMatch,
   matchesControllerUpdateMatch,
+  matchesControllerUpdateScore,
 };
