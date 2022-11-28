@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import {
   matchesServiceGetAll,
   matchesServiceGetProgress,
+  matchesServiceInPutMatch,
+  matchesServiceUpdateMatch,
 } from '../service/matchesService';
 
 async function matchesControllerGetAll(req: Request, res: Response) {
@@ -15,4 +17,24 @@ async function matchesControllerGetAll(req: Request, res: Response) {
   res.status(200).json(matches);
 }
 
-export default matchesControllerGetAll;
+async function matchesControllerInPutMatch(req: Request, res: Response) {
+  const sentMatch = { ...req.body, inProgress: true };
+  const {
+    newMatch,
+  } = await matchesServiceInPutMatch(sentMatch);
+  if (!newMatch) return res.status(400).json({ message: 'No teams inserted' });
+  res.status(201).json(newMatch);
+}
+
+async function matchesControllerUpdateMatch(req: Request, res: Response) {
+  const id = Number(req.params.id);
+  const { message } = await matchesServiceUpdateMatch(id);
+  if (!message) return res.status(400).json({ message: 'No teams patched' });
+  res.status(200).json({ message });
+}
+
+export {
+  matchesControllerGetAll,
+  matchesControllerInPutMatch,
+  matchesControllerUpdateMatch,
+};
