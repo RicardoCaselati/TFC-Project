@@ -1,10 +1,13 @@
 import { Router } from 'express';
-import teamsControllerGetAll from '../controller/teamController';
+import {
+  teamsControllerGetAll,
+  teamsControllerGetById,
+} from '../controller/teamController';
 // import validateProductBody from '../middlewares/product.validation';
 
 const router = Router();
 
 router.get('/', teamsControllerGetAll);
-// router.post('/', validateProductBody, ProductController.create.bind(ProductController));
+router.get('/:id', teamsControllerGetById);
 
 export default router;

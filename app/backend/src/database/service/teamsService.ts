@@ -1,20 +1,20 @@
 import Team from '../models/Teams';
 
-// const teamsGetAll = async (): Promise<{
-//   type: number | null,
-//   teams: { id: number, teamName: string }[]
-// }> => {
-//   const teams = await Team.findAll();
-
-//   const test = { type: null, teams };
-
-//   return test;
-// };
-
 const teamsServiceGetAll = async (): Promise<{ teams: { id: number, teamName: string }[] }> => {
   const teams = await Team.findAll();
 
   return { teams };
 };
 
-export default teamsServiceGetAll;
+const teamsServiceGetById = async (idParam: number): Promise<{
+  team: { id: number, teamName: string } | null
+}> => {
+  const team = await Team.findByPk(idParam);
+
+  return { team };
+};
+
+export {
+  teamsServiceGetAll,
+  teamsServiceGetById,
+};
