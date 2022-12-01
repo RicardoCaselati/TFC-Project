@@ -6,7 +6,7 @@ import Sequelize from '../models/index';
 
 // let teamProfile: ILeaderboardHome;
 
-const myQuery = `SELECT t.team_name AS 'name',
+const homeTeamQuery = `SELECT t.team_name AS 'name',
 
 SUM( CASE WHEN m.home_team_goals > m.away_team_goals THEN 3 ELSE 0 END ) +
   SUM( CASE WHEN m.home_team_goals = m.away_team_goals THEN 1 ELSE 0 END ) AS totalPoints,
@@ -36,11 +36,37 @@ WHERE m.in_progress = 0
 GROUP BY t.team_name
 ORDER BY totalPoints DESC, totalVictories DESC, goalsBalance DESC, goalsFavor DESC, goalsOwn;`;
 
-const leaderboardServiceGetAll = async (): Promise<{
+const awayTeamQuery = `SELECT t.team_name AS 'name',
+SUM( CASE WHEN m.away_team_goals > m.home_team_goals THEN 3 ELSE 0 END ) +
+  SUM( CASE WHEN m.home_team_goals = m.away_team_goals THEN 1 ELSE 0 END ) AS totalPoints,
+COUNT( m.away_team ) AS totalGames,
+SUM( CASE WHEN m.away_team_goals > m.home_team_goals THEN 1 ELSE 0 END ) AS totalVictories,
+  SUM( CASE WHEN m.away_team_goals = m.home_team_goals THEN 1 ELSE 0 END ) AS totalDraws,
+  SUM( CASE WHEN m.away_team_goals < m.home_team_goals THEN 1 ELSE 0 END ) AS totalLosses,
+  SUM(m.away_team_goals) AS goalsFavor,
+SUM(m.home_team_goals) AS goalsOwn,
+(SUM(m.away_team_goals)-SUM(m.home_team_goals)) AS goalsBalance,
+  ROUND(((SUM( CASE WHEN m.away_team_goals > m.home_team_goals THEN 1 ELSE 0 END )*3 +
+  SUM( CASE WHEN m.away_team_goals = m.home_team_goals THEN 1 ELSE 0 END ))/
+  (COUNT(m.away_team) * 3)) * 100, 2) AS efficiency
+FROM TRYBE_FUTEBOL_CLUBE.matches AS m
+INNER JOIN TRYBE_FUTEBOL_CLUBE.teams AS t ON t.id = m.away_team
+WHERE m.in_progress = 0
+GROUP BY t.team_name
+ORDER BY totalPoints DESC, totalVictories DESC, goalsBalance DESC, goalsFavor DESC, goalsOwn;`;
+
+const leaderboardHomeServiceGetAll = async (): Promise<{
   teamProfile: ILeaderboardHome[] | unknown;
 }> => {
-  const [teamProfile] = await Sequelize.query(myQuery);
+  const [teamProfile] = await Sequelize.query(homeTeamQuery);
   return { teamProfile };
+};
+
+const leaderboardAwayServiceGetAll = async (): Promise<{
+  teamAwayProfile: ILeaderboardHome[] | unknown;
+}> => {
+  const [teamAwayProfile] = await Sequelize.query(awayTeamQuery);
+  return { teamAwayProfile };
 };
 
 // const myQuery = `SELECT t.team_name AS 'name',
@@ -72,4 +98,7 @@ const leaderboardServiceGetAll = async (): Promise<{
 // return { teamProfile };
 // };
 
-export default leaderboardServiceGetAll;
+export {
+  leaderboardHomeServiceGetAll,
+  leaderboardAwayServiceGetAll,
+};
