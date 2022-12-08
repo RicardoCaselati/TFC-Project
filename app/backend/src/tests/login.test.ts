@@ -10,7 +10,7 @@ import User from '../database/models/User'
 import {
   loginUser,
   loginMockResponse
-} from './login.mock'
+} from './util/mocks/allmocks'
 
 import { Response } from 'superagent';
 
