@@ -2,10 +2,6 @@ import ILeaderboardHome from '../interfaces/leaderboard/ILeaderboard';
 import Sequelize from '../models/index';
 import homeTeamQuery from './utils/leaderBoardHome';
 import awayTeamQuery from './utils/leaderBoardAway';
-// import test from './utils/leaderBoard.functions';
-// const leaderboardServiceGetAll = async (): Promise<{ matches: Matches[] }> => {
-//   return { matches };
-// };
 
 const leaderboardHomeServiceGetAll = async (): Promise<{
   teamProfile: ILeaderboardHome[] | unknown;
@@ -63,8 +59,8 @@ const leaderboardServiceGetAll = async (): Promise<ILeaderboardHome[]> => {
   const { teamAwayProfile } = await leaderboardAwayServiceGetAll();
   const homeTeams = teamProfile as ILeaderboardHome[];
   const awayTeams = teamAwayProfile as ILeaderboardHome[];
-  const map: ILeaderboardHome[] = teamsToLeaderboard(homeTeams, awayTeams);
-  return map;
+  const mergeAndOrderTables: ILeaderboardHome[] = teamsToLeaderboard(homeTeams, awayTeams);
+  return mergeAndOrderTables;
 };
 
 export {
