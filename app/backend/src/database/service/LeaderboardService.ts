@@ -52,7 +52,6 @@ const teamsToLeaderboard = (homeTeams: ILeaderboardHome[], awayTeams: ILeaderboa
   const objMap: ILeaderboardHome[] = homeTeams.map((eachItem) => {
     const { name } = eachItem;
     const team = awayTeams.find((awayTeam) => awayTeam.name === name);
-    console.log('🚀 ~ homeTeams.map ~ team', team);
     if (!team) throw new Error('time não encontrado');
     return calc(eachItem, team);
   });
