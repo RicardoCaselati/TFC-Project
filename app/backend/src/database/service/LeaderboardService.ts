@@ -1,68 +1,72 @@
-import {
-  ILeaderboardHome,
-} from '../interfaces/leaderboard/ILeaderboard';
+import ILeaderboardHome from '../interfaces/leaderboard/ILeaderboard';
 import Sequelize from '../models/index';
 import homeTeamQuery from './utils/leaderBoardHome';
 import awayTeamQuery from './utils/leaderBoardAway';
-
-const homeQuery = homeTeamQuery();
-const awayQuery = awayTeamQuery();
-
-const leaderboardServiceGetAll = async (): Promise<{
-  test: { homeObject: unknown[], awayObject: unknown[] } | unknown;
-}> => {
-  const [homeObject] = await Sequelize.query(homeQuery);
-  const [awayObject] = await Sequelize.query(awayQuery);
-  const test = { homeObject, awayObject };
-
-  console.log('🚀 ~ file: LeaderboardService.ts:13 ~ homeObject', Object.keys(homeObject));
-  // console.log('🚀 ~ file: LeaderboardService.ts:14 ~ awayObject', awayObject);
-
-  return { test };
-};
+// import test from './utils/leaderBoard.functions';
+// const leaderboardServiceGetAll = async (): Promise<{ matches: Matches[] }> => {
+//   return { matches };
+// };
 
 const leaderboardHomeServiceGetAll = async (): Promise<{
   teamProfile: ILeaderboardHome[] | unknown;
 }> => {
-  const [teamProfile] = await Sequelize.query(homeQuery);
+  const [teamProfile] = await Sequelize.query(homeTeamQuery);
   return { teamProfile };
 };
 
 const leaderboardAwayServiceGetAll = async (): Promise<{
   teamAwayProfile: ILeaderboardHome[] | unknown;
 }> => {
-  const [teamAwayProfile] = await Sequelize.query(awayQuery);
+  const [teamAwayProfile] = await Sequelize.query(awayTeamQuery);
   return { teamAwayProfile };
 };
 
-// const myQuery = `SELECT t.team_name AS 'name',
-// (SUM( CASE WHEN m.home_team_goals > m.away_team_goals THEN 1 ELSE 0 END )*3+
-//   SUM( CASE WHEN m.home_team_goals = m.away_team_goals THEN 1 ELSE 0 END )) AS totalPoints,
-// SUM(CASE WHEN m.in_progress = 1 THEN 0 ELSE 1 END) AS totalgames,
-// SUM( CASE WHEN m.home_team_goals > m.away_team_goals THEN 1 ELSE 0 END ) AS totalVictories,
-// SUM( CASE WHEN m.home_team_goals = m.away_team_goals THEN 1 ELSE 0 END ) AS totalDraws,
-// SUM( CASE WHEN m.home_team_goals < m.away_team_goals THEN 1 ELSE 0 END ) AS totalLosses,
-// SUM(m.home_team_goals) AS goalsFavor,
-// SUM(m.away_team_goals) AS goalsOwn,
-// (SUM(m.home_team_goals)-SUM(m.away_team_goals)) AS goalsBalance,
-// ROUND(((SUM( CASE WHEN m.home_team_goals > m.away_team_goals THEN 1 ELSE 0 END )*3+
-//   SUM( CASE WHEN m.home_team_goals = m.away_team_goals THEN 1 ELSE 0 END ))/
-//   (COUNT(m.home_team) * 3)) * 100, 2) AS efficiency
-// FROM TRYBE_FUTEBOL_CLUBE.matches AS m
-// INNER JOIN TRYBE_FUTEBOL_CLUBE.teams AS t ON t.id = m.home_team
-// GROUP BY t.team_name
-// ORDER BY totalPoints DESC, totalVictories, goalsBalance DESC, goalsFavor DESC, goalsOwn;`;
+const reOrderFunction = (objToReturn: ILeaderboardHome[]) => {
+  const obj = objToReturn.sort((a, b) =>
+    b.totalPoints - a.totalPoints
+    || b.totalVictories - a.totalVictories
+    || b.goalsBalance - a.goalsBalance
+    || b.goalsFavor - a.goalsFavor);
+  return obj;
+};
 
-// const leaderboardServiceGetAll = async (): Promise<{ teamProfile: Matches[] }> => {
-// Matches.sum('inProgress', { where: { inProgress: { [Op.not]: true } } });
-// const teamProfile = await Matches.findAll({
-//   include: [
-//     { model: Team, as: 'teamHome', attributes: { exclude: ['id'] } },
-//     { model: Team, as: 'teamAway', attributes: { exclude: ['id'] } },
-//   ],
-// });
-// return { teamProfile };
-// };
+const calc = (eachItem: ILeaderboardHome, team: ILeaderboardHome) => {
+  const totalPoints = Number(eachItem.totalPoints) + Number(team.totalPoints);
+  const totalGames = Number(eachItem.totalGames) + Number(team.totalGames);
+  const { name } = eachItem;
+  return {
+    name,
+    totalPoints,
+    totalGames,
+    totalVictories: Number(eachItem.totalVictories) + Number(team.totalVictories),
+    totalDraws: Number(eachItem.totalDraws) + Number(team.totalDraws),
+    totalLosses: Number(eachItem.totalLosses) + Number(team.totalLosses),
+    goalsFavor: Number(eachItem.goalsFavor) + Number(team.goalsFavor),
+    goalsOwn: Number(eachItem.goalsOwn) + Number(team.goalsOwn),
+    goalsBalance: Number(eachItem.goalsBalance) + Number(team.goalsBalance),
+    efficiency: ((totalPoints / (totalGames * 3)) * 100).toFixed(2),
+  };
+};
+
+const teamsToLeaderboard = (homeTeams: ILeaderboardHome[], awayTeams: ILeaderboardHome[]) => {
+  const objMap: ILeaderboardHome[] = homeTeams.map((eachItem) => {
+    const { name } = eachItem;
+    const team = awayTeams.find((awayTeam) => awayTeam.name === name);
+    console.log('🚀 ~ homeTeams.map ~ team', team);
+    if (!team) throw new Error('time não encontrado');
+    return calc(eachItem, team);
+  });
+  return reOrderFunction(objMap);
+};
+
+const leaderboardServiceGetAll = async (): Promise<ILeaderboardHome[]> => {
+  const { teamProfile } = await leaderboardHomeServiceGetAll();
+  const { teamAwayProfile } = await leaderboardAwayServiceGetAll();
+  const homeTeams = teamProfile as ILeaderboardHome[];
+  const awayTeams = teamAwayProfile as ILeaderboardHome[];
+  const map: ILeaderboardHome[] = teamsToLeaderboard(homeTeams, awayTeams);
+  return map;
+};
 
 export {
   leaderboardServiceGetAll,

@@ -1,5 +1,4 @@
-const homeTeamQuery = () => {
-  const query = `SELECT t.team_name AS 'name',
+const homeTeamQuery = `SELECT t.team_name AS 'name',
   SUM( CASE WHEN m.home_team_goals > m.away_team_goals THEN 3 ELSE 0 END ) +
     SUM( CASE WHEN m.home_team_goals = m.away_team_goals THEN 1 ELSE 0 END ) AS totalPoints,
   COUNT( m.home_team ) AS totalGames,
@@ -16,7 +15,5 @@ const homeTeamQuery = () => {
   INNER JOIN TRYBE_FUTEBOL_CLUBE.teams AS t ON t.id = m.home_team
   WHERE m.in_progress = 0 GROUP BY t.team_name
   ORDER BY totalPoints DESC, totalVictories DESC, goalsBalance DESC, goalsFavor DESC, goalsOwn;`;
-  return query;
-};
 
 export default homeTeamQuery;

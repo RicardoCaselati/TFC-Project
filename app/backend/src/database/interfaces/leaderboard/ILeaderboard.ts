@@ -8,37 +8,7 @@ interface ILeaderboardHome {
   goalsFavor: number;
   goalsOwn: number;
   goalsBalance: number;
-  efficiency: number;
+  efficiency: string;
 }
 
-interface ITest {
-  homeObject: {
-    name: string;
-    totalPoints: number;
-    totalGames: number;
-    totalVictories: number;
-    totalDraws: number;
-    totalLosses: number;
-    goalsFavor: number;
-    goalsOwn: number;
-    goalsBalance: number;
-    efficiency: number;
-  },
-  awayObject: {
-    name: string;
-    totalPoints: number;
-    totalGames: number;
-    totalVictories: number;
-    totalDraws: number;
-    totalLosses: number;
-    goalsFavor: number;
-    goalsOwn: number;
-    goalsBalance: number;
-    efficiency: number;
-  }
-}
-
-export {
-  ILeaderboardHome,
-  ITest,
-};
+export default ILeaderboardHome;

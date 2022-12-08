@@ -7,9 +7,9 @@ import {
 // import loginJoiSchema from '../validations/loginJoiSchema';
 
 const leaderboardController = async (_req: Request, res: Response) => {
-  const { test } = await leaderboardServiceGetAll();
+  const map = await leaderboardServiceGetAll();
   // if (!teamProfile) return res.status(400).json({ message: 'Leaderboard not found!' });
-  res.status(200).json(test);
+  res.status(200).json(map);
 };
 
 const leaderboardHomeController = async (_req: Request, res: Response) => {
